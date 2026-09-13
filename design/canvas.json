@@ -1,0 +1,106 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Life OS"
+    },
+    {
+      "id": "page-2",
+      "name": "Directions"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "Home",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1"
+    },
+    {
+      "file": "Week.dc.html",
+      "title": "Week",
+      "x": 520,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1"
+    },
+    {
+      "file": "DayClear.dc.html",
+      "title": "Day Clear",
+      "x": 1040,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1"
+    },
+    {
+      "file": "Nightfall.dc.html",
+      "title": "A · Nightfall",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-2"
+    },
+    {
+      "file": "Questbook.dc.html",
+      "title": "B · Questbook",
+      "x": 520,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-2"
+    },
+    {
+      "file": "Arcade.dc.html",
+      "title": "C · Arcade Ledger",
+      "x": 1040,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-style",
+      "x": 0,
+      "y": -230,
+      "w": 640,
+      "page": "page-1",
+      "text": "Color system, taken from the reference screens\nDark charcoal chrome (#202126 / #2a2b30) with white bold titles. Content on light gray (#e6e7ea) with white cards, near-black text (#2b2c30), gray secondary (#6f7076).\nCyan = Go / selected tab (#1fb9d2). Lime = Claim (#9be22a). Gray = In Progress / locked (#b7b8bd). Gold progress fill on a dark track with the count in a pill. Improved values read before » after with the after in cyan. Red dot only where a claim is waiting."
+    },
+    {
+      "id": "note-a",
+      "x": 0,
+      "y": -290,
+      "w": 390,
+      "page": "page-2",
+      "text": "A · Nightfall\nClosest to the game: a night-sky stage with your avatar, hex level badge, orange accents, green EXP bar, a card-stacked mission panel.\nTradeoff: the busiest of the three; the stage takes a quarter of the screen."
+    },
+    {
+      "id": "note-b",
+      "x": 520,
+      "y": -290,
+      "w": 390,
+      "page": "page-2",
+      "text": "B · Questbook\nA paper quest log. Warm cream, serif headings, missions in one ledger card, the week shown as small pips. Calm and readable.\nTradeoff: least 'game'; the level-up and Day Clear moments will need motion to feel like rewards."
+    },
+    {
+      "id": "note-c",
+      "x": 1040,
+      "y": -290,
+      "w": 390,
+      "page": "page-2",
+      "text": "C · Arcade Ledger (chosen)\nNumbers first: Life Power as a big mono figure with a sparkline, a four-stat strip, dense rows. High contrast lime on near-black.\nTradeoff: coldest tone; the avatar is reduced to a badge, so the character metaphor is weakest."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}
