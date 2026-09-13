@@ -20,6 +20,7 @@ const HABITS: Array<Omit<typeof schema.habits.$inferInsert, "id" | "createdAt">>
   { title: "Gym session", areaId: "health", effort: "L", kind: "hevy_workout", weeklyTarget: 3, preferredDays: [] },
   { title: "Log weight", areaId: "health", effort: "S", kind: "hevy_weight", weeklyTarget: 1, preferredDays: [] },
   { title: "Weekly budget review", areaId: "money", effort: "M", kind: "number_entry", weeklyTarget: 1, preferredDays: [0], entryLabel: "Spent this week ($)", entryMetric: "weekly_spend" },
+  { title: "Log food", areaId: "health", effort: "M", kind: "diet_log", weeklyTarget: 7, preferredDays: [] },
   { title: "Monthly contribution", areaId: "money", effort: "L", kind: "manual", monthDay: 1, preferredDays: [] },
   { title: "Net worth update", areaId: "money", effort: "M", kind: "number_entry", monthDay: 1, preferredDays: [], entryLabel: "Net worth ($)", entryMetric: "net_worth" },
 ];

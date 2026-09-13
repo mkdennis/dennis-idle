@@ -100,3 +100,46 @@ export async function saveTimezoneAction(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/me");
 }
+
+const dietSchema = z.object({
+  calories: z.coerce.number().int().min(0).max(20000),
+  protein: z.coerce.number().int().min(0).max(1000),
+  carbs: z.coerce.number().int().min(0).max(2000).optional().or(z.literal("").transform(() => undefined)),
+  fat: z.coerce.number().int().min(0).max(1000).optional().or(z.literal("").transform(() => undefined)),
+  note: z.string().trim().max(200).optional(),
+});
+
+export async function saveDietAction(_prev: { error?: string; savedXp?: number | null } | undefined, formData: FormData) {
+  const parsed = dietSchema.safeParse({
+    calories: formData.get("calories"),
+    protein: formData.get("protein"),
+    carbs: formData.get("carbs") ?? "",
+    fat: formData.get("fat") ?? "",
+    note: formData.get("note") ?? "",
+  });
+  if (!parsed.success) return { error: "Calories and protein need to be whole numbers" };
+  const { saveDietDay } = await import("@/lib/services/diet");
+  const r = await saveDietDay(await currentDayKey(), parsed.data);
+  revalidatePath("/");
+  revalidatePath("/diet");
+  revalidatePath("/week");
+  return { error: undefined, savedXp: r.missionXp };
+}
+
+export async function saveDietTargetsAction(formData: FormData) {
+  const calories = Number(formData.get("calories"));
+  const protein = Number(formData.get("protein"));
+  if (!Number.isFinite(calories) || !Number.isFinite(protein)) return;
+  const { saveDietTargets } = await import("@/lib/services/diet");
+  await saveDietTargets({ calories, protein });
+  revalidatePath("/diet");
+}
+
+export async function saveBossAction(formData: FormData) {
+  const templateId = String(formData.get("templateId") ?? "");
+  const targetKg = Number(formData.get("targetKg"));
+  if (!templateId || !Number.isFinite(targetKg) || targetKg <= 0) return;
+  const { saveBoss } = await import("@/lib/services/fitness");
+  await saveBoss(templateId, targetKg);
+  revalidatePath("/fitness");
+}

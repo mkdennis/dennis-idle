@@ -84,6 +84,8 @@ function subtitleFor(
     else parts.push(`Hevy · ${HEVY.minWorkoutMinutes}+ min counts automatically`);
   } else if (h?.kind === "hevy_weight") {
     parts.push(m.status === "done" && typeof meta.weightKg === "number" ? `Hevy · ${(meta.weightKg * 2.20462).toFixed(1)} lb` : "Hevy · log a weight in the app");
+  } else if (h?.kind === "diet_log") {
+    parts.push(m.status === "done" && typeof meta.calories === "number" ? `${meta.calories.toLocaleString()} kcal · ${meta.protein} g protein` : "Log calories and protein on the Diet tab");
   } else if (h?.kind === "number_entry") {
     parts.push(m.status === "done" && typeof meta.value === "number" ? `${h.entryLabel?.replace(/\s*\(.*\)$/, "")}: ${meta.value.toLocaleString()}` : (h.entryLabel ?? area));
   } else if (h) {

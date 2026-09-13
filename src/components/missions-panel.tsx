@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import Link from "next/link";
 import { addTaskAction, claimDayClearAction, completeMissionAction, reopenMissionAction, skipMissionAction } from "@/app/actions";
 import { Check, Close, Coin } from "./icons";
 import type { DayClearState } from "@/lib/game/day-clear";
@@ -14,7 +15,7 @@ export interface MissionRow {
   xp: number;
   coins: number;
   status: "open" | "done" | "skipped";
-  kind: "manual" | "hevy_workout" | "hevy_weight" | "number_entry" | "task";
+  kind: "manual" | "hevy_workout" | "hevy_weight" | "number_entry" | "diet_log" | "task";
   subtitle: string;
   entryLabel?: string | null;
 }
@@ -110,7 +111,11 @@ function Row({ m, pending, onGo, onSkip, onReopen }: { m: MissionRow; pending: b
         <button className="btn btn-gray shrink-0 px-2.5 text-[11px]" onClick={onReopen} disabled={pending}>Skipped</button>
       ) : (
         <div className="flex shrink-0 items-center gap-1">
-          <button className="btn btn-cyan" onClick={onGo} disabled={pending}>{m.kind === "number_entry" ? "Go" : "Done"}</button>
+          {m.kind === "diet_log" ? (
+            <Link href="/diet" className="btn btn-cyan">Go</Link>
+          ) : (
+            <button className="btn btn-cyan" onClick={onGo} disabled={pending}>{m.kind === "number_entry" ? "Go" : "Done"}</button>
+          )}
           <button className="flex h-8 w-6 items-center justify-center text-ink-2" title="Skip today" onClick={onSkip} disabled={pending} aria-label="Skip">
             <Close size={12} />
           </button>

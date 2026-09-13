@@ -8,7 +8,7 @@ export const areas = pgTable("areas", {
   xp: integer("xp").notNull().default(0),
 });
 
-export type HabitKind = "manual" | "hevy_workout" | "hevy_weight" | "number_entry";
+export type HabitKind = "manual" | "hevy_workout" | "hevy_weight" | "number_entry" | "diet_log";
 
 export const habits = pgTable("habits", {
   id: serial("id").primaryKey(),
@@ -105,4 +105,15 @@ export const metricReadings = pgTable("metric_readings", {
 export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
+});
+
+/** One row per game day of food logging. Calories and grams are whole numbers. */
+export const dietDays = pgTable("diet_days", {
+  dayKey: date("day_key").primaryKey(),
+  calories: integer("calories").notNull(),
+  protein: integer("protein").notNull(),
+  carbs: integer("carbs"),
+  fat: integer("fat"),
+  note: text("note"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
