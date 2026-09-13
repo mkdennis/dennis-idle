@@ -48,7 +48,7 @@ export default async function DietPage() {
           <div className="rounded-[9px] border border-[#b5843c] bg-[#fff4e0] px-3 py-2.5">
             <div className="flex items-center justify-between">
               <div className="text-[13px] font-black text-[#4a2f14]">Today</div>
-              <div className="font-mono text-[11px] font-extrabold text-[#8a5a24]">{today ? "logged" : "not logged"}</div>
+              <div className="font-mono text-[11px] font-extrabold text-[#8a5a24]">{today ? (today.source === "apple_health" ? "from Apple Health" : "logged by hand") : "not logged"}</div>
             </div>
             <div className="mt-2 flex flex-col gap-2">
               <Meter label="Calories" value={today?.calories ?? 0} target={targets.calories} unit="kcal" pct={calPct} fill="var(--gold-grad)" />

@@ -4,6 +4,7 @@ import { Hud } from "@/components/hud";
 import { LifePowerCard } from "@/components/life-power-card";
 import { MissionsPanel, type MissionRow } from "@/components/missions-panel";
 import { AreaCards } from "@/components/area-cards";
+import { WeekStrip } from "@/components/week-strip";
 import { TabBar } from "@/components/tab-bar";
 import { dayClearState } from "@/lib/game/day-clear";
 import { dayOfMonthOfKey, formatCountdown, msUntilReset, weekdayLabel } from "@/lib/game/time";
@@ -60,6 +61,7 @@ export default async function HomePage() {
       <Hud state={state} countdown={formatCountdown(msUntilReset(now, tz))} dayOfMonth={dayOfMonthOfKey(dayKey)} />
       <LifePowerCard state={state} />
       <MissionsPanel missions={sorted} dayClear={dc} areas={areaRows.map((a) => ({ id: a.id, name: a.name }))} weekdayLabel={weekdayLabel(dayKey)} />
+      <WeekStrip today={dayKey} />
       <AreaCards areas={state.areas} />
       <TabBar active="/" exp={state.character} />
     </main>

@@ -55,3 +55,9 @@ export const Dumbbell = ({ size = 22, ...p }: P) => (
 export const Bowl = ({ size = 22, ...p }: P) => (
   <svg {...base(size, p)} strokeWidth={2.2}><path d="M4 11h16a8 8 0 0 1-16 0z" /><path d="M8 11c0-3 2-5 4-6" /><path d="M14 11c0-2 1-4 3-5" /></svg>
 );
+export const Gift = ({ size = 22, ...p }: P) => (
+  <svg {...base(size, p)} strokeWidth={2.2}><rect x="3" y="9" width="18" height="12" rx="2" /><path d="M3 13h18" /><path d="M12 9v12" /><path d="M12 9c-2-3-6-4-6-1s4 1 6 1z" /><path d="M12 9c2-3 6-4 6-1s-4 1-6 1z" /></svg>
+);
+export const Trash = ({ size = 14, ...p }: P) => (
+  <svg {...base(size, p)}><path d="M4 7h16" /><path d="M9 7V4h6v3" /><path d="M6 7l1 13h10l1-13" /></svg>
+);

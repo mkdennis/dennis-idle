@@ -143,3 +143,38 @@ export async function saveBossAction(formData: FormData) {
   await saveBoss(templateId, targetKg);
   revalidatePath("/fitness");
 }
+
+const rewardSchema = z.object({
+  title: z.string().trim().min(1).max(80),
+  condition: z.enum(["area_level", "days_cleared", "gym_sessions", "food_logged_days", "protein_hits", "boss_defeated", "coins"]),
+  param: z.string().trim().optional(),
+  target: z.coerce.number().int().min(1).max(100000),
+});
+
+export async function addRewardAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const parsed = rewardSchema.safeParse({
+    title: formData.get("title"),
+    condition: formData.get("condition"),
+    param: formData.get("param") ?? undefined,
+    target: formData.get("target") ?? 1,
+  });
+  if (!parsed.success) return { error: "Name the reward and give it a whole-number target" };
+  const { createReward } = await import("@/lib/services/rewards");
+  const d = parsed.data;
+  await createReward(d.title, d.condition, d.condition === "area_level" ? (d.param ?? "health") : null, d.condition === "boss_defeated" ? 1 : d.target, await currentDayKey());
+  revalidatePath("/rewards");
+  return { error: undefined };
+}
+
+export async function claimRewardAction(id: number) {
+  const { claimReward } = await import("@/lib/services/rewards");
+  const ok = await claimReward(id, await currentDayKey());
+  revalidatePath("/rewards");
+  return ok;
+}
+
+export async function deleteRewardAction(id: number) {
+  const { deleteReward } = await import("@/lib/services/rewards");
+  await deleteReward(id);
+  revalidatePath("/rewards");
+}

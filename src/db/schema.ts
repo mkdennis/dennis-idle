@@ -115,5 +115,28 @@ export const dietDays = pgTable("diet_days", {
   carbs: integer("carbs"),
   fat: integer("fat"),
   note: text("note"),
+  source: text("source").notNull().default("manual"), // manual | apple_health
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type RewardCondition =
+  | "area_level" // param: area id, target: level
+  | "days_cleared" // target: lifetime days cleared
+  | "gym_sessions" // target: lifetime counted sessions
+  | "food_logged_days" // target: lifetime days logged
+  | "protein_hits" // target: lifetime days protein target hit
+  | "boss_defeated" // target: 1 (current boss reached)
+  | "coins"; // target: lifetime coins earned
+
+/** A real-life treat unlocked by hitting a milestone. */
+export const rewards = pgTable("rewards", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  condition: text("condition").notNull().$type<RewardCondition>(),
+  param: text("param"),
+  target: integer("target").notNull(),
+  /** Progress value at creation, so lifetime counters start from zero for this reward. */
+  baseline: integer("baseline").notNull().default(0),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

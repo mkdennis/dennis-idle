@@ -90,7 +90,7 @@ export default async function WeekPage() {
         </div>
       </div>
 
-      <TabBar active="/week" exp={state.character} />
+      <TabBar active="/" exp={state.character} />
     </main>
   );
 }

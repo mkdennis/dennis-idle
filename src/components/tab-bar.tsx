@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Bowl, Calendar, Dumbbell, Home, Person } from "./icons";
+import { Bowl, Dumbbell, Gift, Home, Person } from "./icons";
 
 const TABS: Array<{ href: string; label: string; Icon: typeof Home; disabled?: boolean }> = [
   { href: "/", label: "Home", Icon: Home },
   { href: "/fitness", label: "Fitness", Icon: Dumbbell },
   { href: "/diet", label: "Diet", Icon: Bowl },
-  { href: "/week", label: "Week", Icon: Calendar },
+  { href: "/rewards", label: "Rewards", Icon: Gift },
   { href: "/me", label: "Me", Icon: Person },
 ];
 

@@ -111,3 +111,31 @@ export function LeafBadge({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
+
+export function TreasureChest({ size = 96, open = false }: { size?: number; open?: boolean }) {
+  return (
+    <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden>
+      <ellipse cx="50" cy="90" rx="34" ry="6" fill="#000" opacity=".3" />
+      {open && (
+        <>
+          <path d="M50 10 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#ffd23f" />
+          <path d="M22 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" opacity=".9" />
+          <path d="M78 22 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" opacity=".9" />
+          <ellipse cx="50" cy="52" rx="26" ry="8" fill="#ffd23f" opacity=".5" />
+        </>
+      )}
+      {/* lid */}
+      <path d={open ? "M18 44 L18 30 Q18 18 30 18 L70 18 Q82 18 82 30 L82 44 Z" : "M18 50 L18 38 Q18 26 30 26 L70 26 Q82 26 82 38 L82 50 Z"} fill="#a05a1c" stroke="#1a1a1c" strokeWidth="2" transform={open ? "rotate(-28 18 44)" : undefined} />
+      <path d={open ? "M18 44 L18 30 Q18 18 30 18 L70 18 Q82 18 82 30 L82 44 Z" : "M18 50 L18 38 Q18 26 30 26 L70 26 Q82 26 82 38 L82 50 Z"} fill="none" stroke="#f2b90c" strokeWidth="3" strokeDasharray="0 0" transform={open ? "rotate(-28 18 44)" : undefined} opacity=".7" />
+      {/* base */}
+      <rect x="18" y="50" width="64" height="36" rx="5" fill="#c97a2b" stroke="#1a1a1c" strokeWidth="2" />
+      <rect x="18" y="50" width="64" height="8" fill="#8a4d16" />
+      <rect x="20" y="52" width="60" height="32" rx="4" fill="none" stroke="#f2b90c" strokeWidth="2.5" opacity=".8" />
+      {/* lock */}
+      <rect x="43" y="56" width="14" height="14" rx="3" fill="#f2b90c" stroke="#1a1a1c" strokeWidth="1.5" />
+      <circle cx="50" cy="62" r="2.2" fill="#1a1a1c" />
+      {/* gold inside when open */}
+      {open && <ellipse cx="50" cy="52" rx="26" ry="6" fill="#ffd23f" stroke="#b58900" strokeWidth="1.5" />}
+    </svg>
+  );
+}
