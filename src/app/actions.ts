@@ -1,0 +1,180 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { db, schema } from "@/db";
+import { DAY_CLEAR } from "@/config/game";
+import { clearSessionCookie, passwordMatches, setSessionCookie } from "@/lib/auth";
+import { addTaskForDay, claimDayClear, completeMission, currentDayKey, reopenMission, skipMission } from "@/lib/services/missions";
+import { syncHevy, type SyncReport } from "@/lib/services/hevy-sync";
+import { setSetting } from "@/lib/services/settings";
+
+export async function loginAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  const next = String(formData.get("next") ?? "/");
+  if (!passwordMatches(password)) return { error: "Wrong password" };
+  await setSessionCookie();
+  redirect(next.startsWith("/") ? next : "/");
+}
+
+export async function logoutAction() {
+  await clearSessionCookie();
+  redirect("/login");
+}
+
+export async function completeMissionAction(missionId: number, value?: number) {
+  const mission = await db.query.missions.findFirst({ where: (m, { eq }) => eq(m.id, missionId) });
+  if (!mission) return null;
+  const meta: Record<string, unknown> = {};
+  if (value != null && Number.isFinite(value)) {
+    meta.value = value;
+    const habit = mission.habitId ? await db.query.habits.findFirst({ where: (h, { eq }) => eq(h.id, mission.habitId!) }) : null;
+    if (habit?.entryMetric) {
+      await db.insert(schema.metricReadings).values({ metric: habit.entryMetric, value: String(value), dayKey: mission.dayKey, source: "manual" });
+    }
+  }
+  const result = await completeMission(missionId, meta);
+  revalidatePath("/");
+  revalidatePath("/week");
+  return result;
+}
+
+export async function skipMissionAction(missionId: number) {
+  await skipMission(missionId);
+  revalidatePath("/");
+}
+
+export async function reopenMissionAction(missionId: number) {
+  await reopenMission(missionId);
+  revalidatePath("/");
+}
+
+export async function claimDayClearAction() {
+  const dayKey = await currentDayKey();
+  const ok = await claimDayClear(dayKey);
+  revalidatePath("/");
+  revalidatePath("/week");
+  return ok ? { coins: DAY_CLEAR.coins, xp: DAY_CLEAR.xp } : null;
+}
+
+const taskSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  areaId: z.string().min(1),
+  effort: z.enum(["S", "M", "L"]),
+});
+
+export async function addTaskAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const parsed = taskSchema.safeParse({
+    title: formData.get("title"),
+    areaId: formData.get("areaId"),
+    effort: formData.get("effort"),
+  });
+  if (!parsed.success) return { error: "Give the task a title" };
+  await addTaskForDay(parsed.data.title, parsed.data.areaId, parsed.data.effort, await currentDayKey());
+  revalidatePath("/");
+  return { error: undefined };
+}
+
+export async function syncHevyAction(): Promise<SyncReport | { error: string }> {
+  try {
+    const report = await syncHevy();
+    await setSetting("hevy_last_sync", new Date().toISOString());
+    revalidatePath("/");
+    revalidatePath("/week");
+    revalidatePath("/me");
+    return report;
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function saveTimezoneAction(formData: FormData) {
+  const tz = String(formData.get("timezone") ?? "").trim();
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+  } catch {
+    return;
+  }
+  await setSetting("timezone", tz);
+  revalidatePath("/");
+  revalidatePath("/me");
+}
+
+const dietSchema = z.object({
+  calories: z.coerce.number().int().min(0).max(20000),
+  protein: z.coerce.number().int().min(0).max(1000),
+  carbs: z.coerce.number().int().min(0).max(2000).optional().or(z.literal("").transform(() => undefined)),
+  fat: z.coerce.number().int().min(0).max(1000).optional().or(z.literal("").transform(() => undefined)),
+  note: z.string().trim().max(200).optional(),
+});
+
+export async function saveDietAction(_prev: { error?: string; savedXp?: number | null } | undefined, formData: FormData) {
+  const parsed = dietSchema.safeParse({
+    calories: formData.get("calories"),
+    protein: formData.get("protein"),
+    carbs: formData.get("carbs") ?? "",
+    fat: formData.get("fat") ?? "",
+    note: formData.get("note") ?? "",
+  });
+  if (!parsed.success) return { error: "Calories and protein need to be whole numbers" };
+  const { saveDietDay } = await import("@/lib/services/diet");
+  const r = await saveDietDay(await currentDayKey(), parsed.data);
+  revalidatePath("/");
+  revalidatePath("/diet");
+  revalidatePath("/week");
+  return { error: undefined, savedXp: r.missionXp };
+}
+
+export async function saveDietTargetsAction(formData: FormData) {
+  const calories = Number(formData.get("calories"));
+  const protein = Number(formData.get("protein"));
+  if (!Number.isFinite(calories) || !Number.isFinite(protein)) return;
+  const { saveDietTargets } = await import("@/lib/services/diet");
+  await saveDietTargets({ calories, protein });
+  revalidatePath("/diet");
+}
+
+export async function saveBossAction(formData: FormData) {
+  const templateId = String(formData.get("templateId") ?? "");
+  const targetKg = Number(formData.get("targetKg"));
+  if (!templateId || !Number.isFinite(targetKg) || targetKg <= 0) return;
+  const { saveBoss } = await import("@/lib/services/fitness");
+  await saveBoss(templateId, targetKg);
+  revalidatePath("/fitness");
+}
+
+const rewardSchema = z.object({
+  title: z.string().trim().min(1).max(80),
+  condition: z.enum(["area_level", "days_cleared", "gym_sessions", "food_logged_days", "protein_hits", "boss_defeated", "coins"]),
+  param: z.string().trim().optional(),
+  target: z.coerce.number().int().min(1).max(100000),
+});
+
+export async function addRewardAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const parsed = rewardSchema.safeParse({
+    title: formData.get("title"),
+    condition: formData.get("condition"),
+    param: formData.get("param") ?? undefined,
+    target: formData.get("target") ?? 1,
+  });
+  if (!parsed.success) return { error: "Name the reward and give it a whole-number target" };
+  const { createReward } = await import("@/lib/services/rewards");
+  const d = parsed.data;
+  await createReward(d.title, d.condition, d.condition === "area_level" ? (d.param ?? "health") : null, d.condition === "boss_defeated" ? 1 : d.target, await currentDayKey());
+  revalidatePath("/rewards");
+  return { error: undefined };
+}
+
+export async function claimRewardAction(id: number) {
+  const { claimReward } = await import("@/lib/services/rewards");
+  const ok = await claimReward(id, await currentDayKey());
+  revalidatePath("/rewards");
+  return ok;
+}
+
+export async function deleteRewardAction(id: number) {
+  const { deleteReward } = await import("@/lib/services/rewards");
+  await deleteReward(id);
+  revalidatePath("/rewards");
+}

@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* Tokens lifted from the MapleStory Idle reference screens (see design/canvas.json note). */
+:root {
+  --chrome: #202126;
+  --chrome-2: #2a2b30;
+  --chrome-3: #1a1b1f;
+  --chrome-4: #141517;
+  --section: #e6e7ea;
+  --card: #ffffff;
+  --card-done: #cfd0d4;
+  --card-dark: #5a5b60;
+  --ink: #2b2c30;
+  --ink-2: #6f7076;
+  --ink-3: #7a7b80;
+  --muted: #a7a8ae;
+  --tile-strip: #1a1a1c;
+  --cyan: #1fb9d2;
+  --cyan-2: #159fb8;
+  --cyan-grad: linear-gradient(180deg, #2fcbe3, #16aac3);
+  --lime: #9be22a;
+  --lime-grad: linear-gradient(180deg, #b5ec3a, #8fcf1a);
+  --gray-btn: #b7b8bd;
+  --gold: #f2c21b;
+  --gold-ink: #b39200;
+  --gold-grad: linear-gradient(180deg, #ffd23f, #f2b90c);
+  --track: #3a3b40;
+  --red: #ea3a3a;
+  --sky-grad: linear-gradient(180deg, #56a9e8 0%, #a9dcff 100%);
+}
+
+@theme inline {
+  --color-chrome: var(--chrome);
+  --color-chrome-2: var(--chrome-2);
+  --color-chrome-3: var(--chrome-3);
+  --color-chrome-4: var(--chrome-4);
+  --color-section: var(--section);
+  --color-card: var(--card);
+  --color-card-done: var(--card-done);
+  --color-card-dark: var(--card-dark);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-muted: var(--muted);
+  --color-tile-strip: var(--tile-strip);
+  --color-cyan: var(--cyan);
+  --color-cyan-2: var(--cyan-2);
+  --color-lime: var(--lime);
+  --color-gray-btn: var(--gray-btn);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-track: var(--track);
+  --color-red: var(--red);
+  --font-sans: var(--font-nunito), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--chrome);
+}
+
+body {
+  margin: 0;
+  background: var(--chrome);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-lg font-black text-white select-none;
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 12px;
+}
+.btn-cyan { background: var(--cyan-grad); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.btn-lime { background: var(--lime-grad); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2); }
+.btn-gray { background: var(--gray-btn); }
+.btn:disabled { background: var(--gray-btn); box-shadow: none; text-shadow: none; }
+
+.panel { @apply overflow-hidden rounded-xl; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25); }
+.panel-head { @apply flex h-10 items-center justify-between px-3 text-sm font-black text-white; background: var(--chrome-2); }
+.panel-body { @apply flex flex-col gap-1.5 p-2; background: var(--section); }
+.card { @apply rounded-[9px] bg-card; }
+.card-done { background: var(--card-done); }
+.hud-chip { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-xs font-extrabold text-white; background: rgba(0, 0, 0, 0.45); }
+.reward-tile { @apply flex w-9 flex-col items-center overflow-hidden rounded-md bg-card; }
+.reward-tile-strip { @apply w-full text-center font-mono text-[9px] font-extrabold text-white; background: var(--tile-strip); line-height: 13px; }
+
+.bar { @apply relative overflow-hidden rounded-full; background: var(--track); }
+.bar-fill { @apply h-full rounded-full; background: var(--gold-grad); }
+.bar-label { @apply absolute inset-0 flex items-center justify-center; }
+.bar-pill { @apply rounded-full px-1.5 font-mono text-[9px] font-extrabold text-white; background: rgba(0, 0, 0, 0.55); line-height: 12px; }
+
+@keyframes pop {
+  0% { transform: scale(0.92); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop { animation: pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
