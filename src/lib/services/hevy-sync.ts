@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { HEVY } from "@/config/game";
+import { EFFORT_COINS, EFFORT_XP, HEVY } from "@/config/game";
 import { fetchRecentBodyMeasurements, fetchWorkoutEventsSince, hevyConfigured, workoutMinutes } from "@/lib/hevy/client";
 import { dayKeyFor, weekStartKey, shiftKey } from "@/lib/game/time";
 import { completeMission, materializeDay } from "./missions";
@@ -83,9 +83,28 @@ export async function syncHevy(now = new Date()): Promise<SyncReport> {
 /** Complete the hevy_workout mission on the workout's game day (materializing it if needed). */
 async function completeWorkoutMission(workoutId: string, startedAt: Date, minutes: number, tz: string): Promise<number> {
   const dayKey = dayKeyFor(startedAt, tz);
-  await materializeDay(dayKey);
   const habit = await db.query.habits.findFirst({ where: and(eq(schema.habits.kind, "hevy_workout"), eq(schema.habits.active, true)) });
   if (!habit) return 0;
+  const today = dayKeyFor(new Date(), tz);
+  if (dayKey === today) {
+    await materializeDay(dayKey);
+  } else {
+    // A past day: record just the gym mission so the workout counts toward the week,
+    // without inventing other missions that can never be done.
+    await db.insert(schema.days).values({ dayKey }).onConflictDoNothing();
+    const exists = await db.query.missions.findFirst({ where: and(eq(schema.missions.dayKey, dayKey), eq(schema.missions.habitId, habit.id)) });
+    if (!exists) {
+      await db.insert(schema.missions).values({
+        dayKey,
+        sourceType: "habit",
+        habitId: habit.id,
+        title: habit.title,
+        areaId: habit.areaId,
+        xp: EFFORT_XP[habit.effort],
+        coins: EFFORT_COINS[habit.effort],
+      });
+    }
+  }
   const mission = await db.query.missions.findFirst({
     where: and(eq(schema.missions.dayKey, dayKey), eq(schema.missions.habitId, habit.id)),
   });
